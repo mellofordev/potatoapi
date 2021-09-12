@@ -16,6 +16,8 @@ def home(request):
     if request.method=='GET':
         authentication_classes=[TokenAuthentication]
         get_user=request.user
+        if get_user.is_anonymous:
+            return Response({'error':'Token not provided.'})
         user_profile=Profile.objects.get(user=get_user)
         user_profile.ipaddress=client_ip(request)
         user_profile.save()
