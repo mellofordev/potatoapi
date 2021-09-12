@@ -17,14 +17,15 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from social.views import newpost, post_view_of_user,home
+from social.views import newpost, post_view_of_user,home_api,follow_api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/',include('accounts.urls')),
     path('apinav/', include('rest_framework.urls')),
     path('newpost/',newpost,name='newpost'),
     path('user-posts/<str:slug>/',post_view_of_user,name='post-of-user'),
-    path('home/',home,name='home')
+    path('api/home/',home_api,name='homeapi'),
+    path('api/follow/<str:slug>/',follow_api,name='followapi')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

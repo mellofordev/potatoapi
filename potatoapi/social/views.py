@@ -1,7 +1,7 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.response import Response
-from .models import Post,Comment,Like
+from .models import Follow, Post,Comment,Like
 from rest_framework.decorators import api_view
 from ipaddr import client_ip
 from rest_framework.authentication import TokenAuthentication
@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 # Create your views here.
 import hashlib
 @api_view(['GET'])
-def home(request):
+def home_api(request):
     if request.method=='GET':
         authentication_classes=[TokenAuthentication]
         get_user=request.user
@@ -34,7 +34,7 @@ def home(request):
                 val=i.id
                 response[val]=profile_serializer.data
             return Response({'notification':'Follow some users to get started','follow':response})
-        feeds_after_serialization=PostSerializers(feeds_for_user)
+        feeds_after_serialization=PostSerializers(feeds_for_user,many=True)
         return Response({'feed':feeds_after_serialization.data})
 
 @api_view(['POST'])
@@ -80,3 +80,22 @@ def post_view_of_user(request,slug):
         return Response({'posts':serializers.data,'profile-url':profile_url})
 
     return Response({'error':serializers.error})
+@api_view(['GET'])
+def follow_api(request,slug):
+    authentication_classes =[TokenAuthentication]
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'Token not provided'})
+    try:
+        get_username=User.objects.get(username=slug)
+        #also get the id 
+        get_user_id =Profile.objects.get(user=get_username)
+    except ObjectDoesNotExist:
+        return Response({'error':'Profile does not exits'})
+    if str(get_user)==str(get_username):
+        return Response({'error':'Follow not allowed'})
+    obj,create=Follow.objects.get_or_create(following=get_username,follower=request.user)
+    get_profile_data=Profile.objects.get(user=get_user_id.id)
+    serializers=ProfileSerializer(get_profile_data)
+    return Response({'profile':serializers.data})
+    
