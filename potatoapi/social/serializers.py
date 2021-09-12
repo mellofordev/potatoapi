@@ -4,6 +4,7 @@ from .models import Post
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from hashlib import blake2b
+import base64
 class NewPostSerializers(serializers.ModelSerializer):
 
     class Meta:
@@ -28,14 +29,23 @@ class NewPostSerializers(serializers.ModelSerializer):
 class PostSerializers(serializers.ModelSerializer):
     user=serializers.SerializerMethodField()
     id=serializers.SerializerMethodField()
-    
+    user_profile_pic=serializers.SerializerMethodField()
     class Meta:
         model=Post
-        fields=['id','user','date_posted','post','pic','video','like_count','comment_count','blocked']
+        fields=['id','user','user_profile_pic','date_posted','post','pic','video','like_count','comment_count','blocked']
     
     def get_user(self,obj):
         return obj.user.username
     def get_id(self,obj):
         return obj.post_short_link
+    def get_user_profile_pic(self,obj):
+        data=str(obj.user.profile.pic)
+        url=''
+        if data =="default.png":
+            url='/media/{}'.format(data)
+        else:
+            url='/media/postpics/{}'.format(data)
+        return url
+
     
     
