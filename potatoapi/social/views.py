@@ -1,10 +1,5 @@
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.query import QuerySet
-from django.shortcuts import render
-from rest_framework import serializers
-from rest_framework import authentication
-from rest_framework import response
 from rest_framework.response import Response
 from .models import Post,Comment,Like
 from rest_framework.decorators import api_view
