@@ -1,10 +1,10 @@
-import hashlib
+
 from rest_framework import serializers
 from .models import Post
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from hashlib import blake2b
-import base64
+
 class NewPostSerializers(serializers.ModelSerializer):
 
     class Meta:

@@ -50,7 +50,7 @@ def newpost(request):
         
         
         serializers =NewPostSerializers(user.user,data=request.data)
-        print(serializers)
+    
         if serializers.is_valid():
             serializers.save()
             return Response({'post': 'Successfully posted'})
