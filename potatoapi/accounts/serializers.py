@@ -1,5 +1,7 @@
+from django.db.models.query import InstanceCheckMeta
 from rest_framework import serializers
 from .models import Profile
+from social.models import Follow
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -7,13 +9,26 @@ from django.core.exceptions import ValidationError
 class ProfileSerializer(serializers.ModelSerializer):
     user =serializers.SerializerMethodField()
     id=serializers.SerializerMethodField()
+    follower_count=serializers.SerializerMethodField()
+    following_count=serializers.SerializerMethodField()
+    #mutual_friends=serializers.SerializerMethodField()
     class Meta :
         model =Profile
-        fields=['id','user','bio','verified','pic']
+        fields=['id','user','follower_count','following_count','bio','verified','pic']
     def get_user(self,obj):
         return obj.user.username
     def get_id(self,obj):
         return  obj.user.id
+    def get_follower_count(self,obj):
+        user=obj.user.id
+        follow=Follow.objects.filter(following=user).count() #following=user defines people who follow us
+        
+        return follow
+    def get_following_count(self,obj):
+        user=obj.user.id
+        follow=Follow.objects.filter(follower=user).count() #follower=user defines people we are following
+        return follow
+
 class SignupSerializers(serializers.ModelSerializer):
     password2=serializers.CharField(style={'input_text':'password'},write_only=True)
     class Meta:
