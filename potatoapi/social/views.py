@@ -9,11 +9,13 @@ from accounts.models import Profile
 from .serializers import NewPostSerializers, PostSerializers
 from accounts.serializers import ProfileSerializer
 from django.contrib.auth.models import User
+from rest_framework.pagination import LimitOffsetPagination
 # Create your views here.
 import hashlib
 @api_view(['GET'])
 def home_api(request):
     if request.method=='GET':
+        paginnation_classes=LimitOffsetPagination()
         authentication_classes=[TokenAuthentication]
         get_user=request.user
         if get_user.is_anonymous:
@@ -23,7 +25,10 @@ def home_api(request):
         user_profile.save()
         feeds_for_user=Post.objects.filter(user__following__follower=get_user)
         feeds_for_user=feeds_for_user.order_by('date_posted').reverse()
-        if len(feeds_for_user)==0:
+        feeds_for_user=paginnation_classes.paginate_queryset(feeds_for_user,request)
+        size_of_feed_query=len(feeds_for_user)
+        paginnation_classes.max_limit=size_of_feed_query
+        if size_of_feed_query==0:
             #suggest some users 
             response={}
             get_minimal_user_profile_data=Profile.objects.filter(blocked='False')
@@ -35,7 +40,8 @@ def home_api(request):
                 response[val]=profile_serializer.data
             return Response({'notification':'Follow some users to get started','follow':response})
         feeds_after_serialization=PostSerializers(feeds_for_user,many=True)
-        return Response({'feed':feeds_after_serialization.data})
+        return paginnation_classes.get_paginated_response({'feed':feeds_after_serialization.data})
+        #return Response({'feed':feeds_after_serialization.data})
 
 @api_view(['POST'])
 def newpost(request):
