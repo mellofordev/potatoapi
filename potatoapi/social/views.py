@@ -1,5 +1,5 @@
-
 from django.core.exceptions import ObjectDoesNotExist
+from django.http.response import HttpResponse
 from rest_framework.response import Response
 from .models import Follow, Post,Comment,Like
 from rest_framework.decorators import api_view
@@ -95,13 +95,16 @@ def follow_api(request,slug):
     try:
         get_username=User.objects.get(username=slug)
         #also get the id 
-        get_user_id =Profile.objects.get(user=get_username)
+        #get_user_id =Profile.objects.get(user=get_username)
     except ObjectDoesNotExist:
         return Response({'error':'Profile does not exits'})
     if str(get_user)==str(get_username):
         return Response({'error':'Follow not allowed'})
     obj,create=Follow.objects.get_or_create(following=get_username,follower=request.user)
-    get_profile_data=Profile.objects.get(user=get_user_id.id)
+    get_profile_data=Profile.objects.get(uuid_all=get_username.id)
+    print(get_profile_data.id)
     serializers=ProfileSerializer(get_profile_data)
     return Response({'profile':serializers.data})
+
+
     

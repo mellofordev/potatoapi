@@ -25,7 +25,8 @@ urlpatterns = [
     path('newpost/',newpost,name='newpost'),
     path('user-posts/<str:slug>/',post_view_of_user,name='post-of-user'),
     path('api/home/',home_api,name='homeapi'),
-    path('api/follow/<str:slug>/',follow_api,name='followapi')
+    path('api/follow/<str:slug>/',follow_api,name='followapi'),
+ 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
