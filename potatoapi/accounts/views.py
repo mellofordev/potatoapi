@@ -48,6 +48,7 @@ def signup_view(request):
             response['status']='User registered successfully'
             get_user=User.objects.get(username=request.data.get('username'))
             get_user.profile.ipaddress=client_ip(request)
+            get_user.profile.uuid_all=get_user.id
             get_user.save()
             token,obj=Token.objects.get_or_create(user=get_user)
             response['token']=str(token)

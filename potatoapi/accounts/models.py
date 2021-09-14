@@ -13,6 +13,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
     name= models.CharField(max_length=50,null=True, blank=True)
+    uuid_all=models.IntegerField(null=True)
     pic=models.ImageField(default='default.png',upload_to='profilepic',null='True')
     verified=models.BooleanField(default=False)
     blocked=models.BooleanField(default=False)

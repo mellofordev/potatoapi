@@ -1,4 +1,4 @@
-from django.db.models.query import InstanceCheckMeta
+
 from rest_framework import serializers
 from .models import Profile
 from social.models import Follow
