@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
+from rest_framework import authentication
 from rest_framework.response import Response
 from .models import Follow, Post,Comment,Like
 from rest_framework.decorators import api_view
@@ -39,7 +40,7 @@ def home_api(request):
                 val=i.id
                 response[val]=profile_serializer.data
             return Response({'notification':'Follow some users to get started','follow':response})
-        feeds_after_serialization=PostSerializers(feeds_for_user,many=True)
+        feeds_after_serialization=PostSerializers(feeds_for_user,many=True,context={'request':request})
         return paginnation_classes.get_paginated_response({'feed':feeds_after_serialization.data})
         #return Response({'feed':feeds_after_serialization.data})
 
@@ -105,6 +106,43 @@ def follow_api(request,slug):
     print(get_profile_data.id)
     serializers=ProfileSerializer(get_profile_data)
     return Response({'profile':serializers.data})
+@api_view(['GET'])
+def followers_api(request,slug):
+    authentication_classes=[TokenAuthentication]
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'Token not provided'})
+    try:
+        user=User.objects.get(username=slug)
+    except ObjectDoesNotExist:
+        return Response({'error':'Profile not found'})
+    get_followers_list=Follow.objects.filter(following=user.id)    
+    response=[]
+    for i in get_followers_list:
+        user_id=User.objects.get(username=i)
+        profile_data=Profile.objects.get(uuid_all=user_id.id)
+        profile_after_serialization=ProfileSerializer(profile_data)
+        response.append(profile_after_serialization.data)
+        
+    return Response({'followers':response})
+@api_view(['GET'])
+def like_api(request,slug):
+    authentication_classes=[TokenAuthentication]
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'No Token provided.'})
+    try:
+        get_post=Post.objects.get(post_short_link=slug)
+        print(get_post)
+    except ObjectDoesNotExist:
+        return Response({'error':'Post not found'})
+    obj,created=Like.objects.get_or_create(post=get_post,user=get_user,liked=True)
+    if obj:
+        return Response({'liked':'Added to likes'})
+    else:
+        
+        return Response({'error':'Something unexcepted happended Try again Later'})
+
 
 
     

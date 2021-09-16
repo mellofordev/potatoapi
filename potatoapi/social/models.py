@@ -30,7 +30,7 @@ class Like(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     liked=models.BooleanField(default=False)
     def __str__(self):
-        return str(self.user)
+        return str(self.post)
 
 
 class Follow(models.Model):
@@ -38,5 +38,5 @@ class Follow(models.Model):
     follower=models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.follower.profile.name
+        return self.follower.username
 
