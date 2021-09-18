@@ -12,11 +12,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     follower_count=serializers.SerializerMethodField()
     following_count=serializers.SerializerMethodField()
     post_count=serializers.SerializerMethodField()
-    mutual_friends=serializers.SerializerMethodField()
+    #mutual_friends=serializers.SerializerMethodField()
     
     class Meta :
         model =Profile
-        fields=['id','user','follower_count','following_count','mutual_friends','post_count','bio','verified','pic']
+        fields=['id','user','follower_count','following_count','post_count','bio','verified','pic']
     def get_user(self,obj):
         return obj.user.username
     def get_id(self,obj):
@@ -34,11 +34,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         user=obj.user.id
         post_num=Post.objects.filter(user=user).count()
         return post_num
-    def get_mutual_friends(self,obj):
+    '''def get_mutual_friends(self,obj):
         get_user=obj.user.id
         get_request_user=self.context.get('request').user
         get_list=Follow.objects.filter(following=get_user)
-        return get_list
+        return get_list'''
 class SignupSerializers(serializers.ModelSerializer):
     password2=serializers.CharField(style={'input_text':'password'},write_only=True)
     class Meta:

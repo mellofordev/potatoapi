@@ -170,4 +170,18 @@ def comment_view_api(request,slug):
         return Response({'comments':response})
     except ObjectDoesNotExist:
         return Response({'error':'No Post found'})
+
+@api_view(['DELETE'])
+def unfollow_api(request,slug):
+    authentication_classes=[TokenAuthentication]
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'No Token provided'})
+    try:
+        get_profile=User.objects.get(username=slug)
         
+        get_follow=Follow.objects.get(following=get_profile,follower=get_user)
+        get_follow.delete()
+        return Response({'unfollowed':'unfollowed successfully'})
+    except ObjectDoesNotExist:
+        return Response({'error':'No profile found'})        
