@@ -19,6 +19,7 @@ class Profile(models.Model):
     blocked=models.BooleanField(default=False)
     forcelock= models.CharField(max_length=3, choices=locker, default='off')
     ipaddress=models.GenericIPAddressField(null=True)
+    #score=models.FloatField(default=0.00)
     def __str__(self):
         return self.user.username
 

@@ -66,7 +66,7 @@ def user_profile(request): # edit profile api
         if user.is_anonymous:
             return Response({'profile':'Token not provided'})
         get_user = Profile.objects.get(user=user)
-        serializer = ProfileSerializer(get_user)
+        serializer = ProfileSerializer(get_user,many=True,context={'request':request})
         response['editprofile']='/api/update/profile/'
     except ObjectDoesNotExist:
         response['login-url']='/api/login/'

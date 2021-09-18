@@ -1,13 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.http.response import HttpResponse
-from rest_framework import authentication
+from rest_framework import serializers
 from rest_framework.response import Response
 from .models import Follow, Post,Comment,Like
 from rest_framework.decorators import api_view
 from ipaddr import client_ip
 from rest_framework.authentication import TokenAuthentication
 from accounts.models import Profile
-from .serializers import NewPostSerializers, PostSerializers
+from .serializers import NewPostSerializers, PostSerializers,CommentSerializers,CommentViewSerializers
 from accounts.serializers import ProfileSerializer
 from django.contrib.auth.models import User
 from rest_framework.pagination import LimitOffsetPagination
@@ -143,6 +142,32 @@ def like_api(request,slug):
         
         return Response({'error':'Something unexcepted happended Try again Later'})
 
-
-
-    
+@api_view(['POST'])
+def comment_create_api(request,slug):
+    authentication_classes=TokenAuthentication
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'No token provided'})
+    serializers=CommentSerializers(data=request.data,context={'request':request,'slug':slug})
+    if serializers.is_valid():
+        serializers.save()
+        return Response({'comment':'Comment post successfully'})
+    else:
+        return Response({'error':serializers.error})
+@api_view(['GET'])
+def comment_view_api(request,slug):
+    authentication_class=[TokenAuthentication]
+    get_user=request.user
+    if get_user.is_anonymous:
+        return Response({'error':'No Token provided'})
+    try:
+        get_post_short_link=Post.objects.get(post_short_link=slug)
+        get_comment=Comment.objects.filter(post_id=get_post_short_link)
+        response=[]
+        for i in get_comment:
+            serializer=CommentViewSerializers(i)
+            response.append(serializer.data)
+        return Response({'comments':response})
+    except ObjectDoesNotExist:
+        return Response({'error':'No Post found'})
+        

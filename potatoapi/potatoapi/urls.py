@@ -12,13 +12,15 @@ Class-based views
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.conf.urls import url
+""" 
 from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from social.views import newpost, post_view_of_user,home_api,follow_api,followers_api,like_api
+from social.views import (
+    newpost, post_view_of_user,home_api,follow_api,followers_api,
+    like_api,comment_create_api,comment_view_api
+    )
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/',include('accounts.urls')),
@@ -28,7 +30,9 @@ urlpatterns = [
     path('api/home/',home_api,name='homeapi'),
     path('api/follow/<str:slug>/',follow_api,name='followapi'),
     path('api/followers/<str:slug>/',followers_api,name='followerslist'),
-    path('api/like/<str:slug>/',like_api,name='likeapi')
+    path('api/like/<str:slug>/',like_api,name='likeapi'),
+    path('api/comment/<str:slug>/',comment_create_api,name='commentapi'),
+    path('api/comment/view/<str:slug>/',comment_view_api,name='commentviewapi')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

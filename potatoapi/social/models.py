@@ -24,7 +24,7 @@ class Comment(models.Model):
     comment=models.CharField(max_length=100,default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
-        return self.comment
+        return str(self.post)
 class Like(models.Model):
     post=models.ForeignKey('social.Post',on_delete=models.CASCADE,related_name='like')
     user=models.ForeignKey(User,on_delete=models.CASCADE)
