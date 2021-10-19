@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Post,Like,Comment
+from .models import Post,Like,Comment,Notification
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from hashlib import blake2b
@@ -10,11 +10,11 @@ class NewPostSerializers(serializers.ModelSerializer):
     class Meta:
         model=Post
         fields=['post','pic']
-    
+
     def save(self):
-        user=self.instance #user data receiver 
+        user=self.instance #user data receiver
         get_id_ =Post.objects.latest('id')
-        
+
         shrt_url=blake2b(digest_size=get_id_.id).hexdigest()
         post=Post(
             user=user,
@@ -25,7 +25,7 @@ class NewPostSerializers(serializers.ModelSerializer):
         )
 
         post.save()
-#this is common for all post serialisations 
+#this is common for all post serialisations
 class PostSerializers(serializers.ModelSerializer):
     user=serializers.SerializerMethodField()
     id=serializers.SerializerMethodField()
@@ -33,25 +33,24 @@ class PostSerializers(serializers.ModelSerializer):
     liked=serializers.SerializerMethodField()
     like_count=serializers.SerializerMethodField()
     comment_count=serializers.SerializerMethodField()
+    verified=serializers.SerializerMethodField()
     #get_request_user= serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
         model=Post
-        fields=['id','user','user_profile_pic','date_posted','post','pic','video','like_count','comment_count','blocked','liked']
-    
+        fields=['id','user','user_profile_pic','verified','date_posted','post','pic','video','like_count','comment_count','blocked','liked']
+
     def get_user(self,obj):
         return obj.user.username
     def get_id(self,obj):
         return obj.post_short_link
     def get_user_profile_pic(self,obj):
         data=str(obj.user.profile.pic)
-        url=''
-        if data =="default.png":
-            url='/media/{}'.format(data)
-        else:
-            url='/media/postpics/{}'.format(data)
-        return url
+
+        return '/media/{}'.format(data)
+    def get_verified(self,obj):
+        return obj.user.profile.verified
     def get_liked(self,obj):
-        
+
         try:
             get_request_user=self.context.get("request").user
             Like.objects.get(post_id=obj,user=get_request_user)
@@ -69,7 +68,7 @@ class PostSerializers(serializers.ModelSerializer):
             get_user_comment_count=Comment.objects.filter(post_id=obj).count()
             return get_user_comment_count
         except ObjectDoesNotExist:
-            return 0    
+            return 0
 class CommentSerializers(serializers.ModelSerializer):
     class Meta:
         model=Comment
@@ -84,24 +83,36 @@ class CommentSerializers(serializers.ModelSerializer):
             user=get_user
 
         )
-        
+
         comment.save()
-    
+
 class CommentViewSerializers(serializers.ModelSerializer):
-            
+
     user=serializers.SerializerMethodField()
     verified=serializers.SerializerMethodField()
     profile_pic=serializers.SerializerMethodField()
 
     class Meta:
         model=Comment
-        fields=['user','verified','profile_pic','comment']    
+        fields=['user','verified','profile_pic','comment']
 
     def get_user(self,obj):
-        
+
         return obj.user.username
     def get_verified(self,obj):
         return obj.user.profile.verified
     def get_profile_pic(self,obj):
         return str(obj.user.profile.pic)
+class NotificationSerializers(serializers.ModelSerializer):
+    fromuser=serializers.SerializerMethodField()
+    touser=serializers.SerializerMethodField()
+    class Meta:
+        model=Notification
+        fields=['fromuser','touser','_type','date','is_read']
+    def get_fromuser(self,obj):
+        print(obj)
+        return obj.fromuser.username
+    def get_touser(self,obj):
+        return obj.touser.username
+
 
