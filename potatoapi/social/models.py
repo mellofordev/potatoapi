@@ -40,3 +40,15 @@ class Follow(models.Model):
     def __str__(self):
         return self.follower.username
 
+types=(('None','None'),('Liked','Liked'),('Following','Following'),('Commented','Commented'))
+class Notification(models.Model):
+
+    fromuser=models.ForeignKey(User,on_delete=models.CASCADE,related_name='fromuser')
+    touser=models.ForeignKey(User,on_delete=models.CASCADE,related_name='touser')
+    _type=models.CharField(max_length=20,choices=types,default='None')
+    date=models.DateTimeField(default=timezone.now)
+    is_read=models.BooleanField(default=0)
+    reference_id=models.IntegerField(null=True)
+    def __str__(self):
+        return self.touser.username
+
