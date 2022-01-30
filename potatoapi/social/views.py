@@ -1,17 +1,18 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from rest_framework.response import Response
-from .models import Follow, Post,Comment,Like,Notification
+from .models import Follow, Post,Comment,Like,Notification, Sticker
 from rest_framework.decorators import api_view
 from ipaddr import client_ip
 from rest_framework.authentication import TokenAuthentication
 from accounts.models import Profile
-from .serializers import NewPostSerializers, PostSerializers,CommentSerializers,CommentViewSerializers,NotificationSerializers
+from .serializers import CreateStickerSerializers, NewPostSerializers, PostSerializers,CommentSerializers,CommentViewSerializers,NotificationSerializers, StickerSerializers
 from accounts.serializers import ProfileSerializer
 from django.contrib.auth.models import User
 from rest_framework.pagination import LimitOffsetPagination
 # Create your views here.
 import hashlib
+
 @api_view(['GET'])
 def home_api(request):
     if request.method=='GET':
@@ -283,5 +284,32 @@ def notification_count_api(request):
     except ObjectDoesNotExist:
         return Response({'notificationacount':0})
     return Response({'notificationcount':notification_count})
+@api_view(['GET'])
+def sticker_api(request):
+    authentication_classes=TokenAuthentication
+    if request.user.is_anonymous:
+        return Response({'error':'Token not provided.'})
+    
+    try:
+        get_stickers=Sticker.objects.all()
+    except ObjectDoesNotExist:
+        return Response({'error':'No stickers available.'})
+    serializers_list=[]    
+    for sticker_objs in get_stickers:
+        serializers=StickerSerializers(sticker_objs)
+        serializers_list.append(serializers.data)
+    return Response({'stickers':serializers_list})
 
-
+@api_view(['POST'])
+def create_sticker_api(request):
+    authentication_classes=TokenAuthentication
+    if request.user.is_anonymous:
+        return Response({'error':'Token not provided.'})
+    
+    serializer =CreateStickerSerializers(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'sticker':'Sticker created successfully'})
+    else:
+        return Response({'error':'Something went wrong'})
+        

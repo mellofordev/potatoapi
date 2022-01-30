@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
@@ -23,6 +24,8 @@ class Comment(models.Model):
     post = models.ForeignKey('social.Post', on_delete=models.CASCADE,related_name='comment')
     comment=models.CharField(max_length=100,default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    sticker=models.BooleanField(default=False)
+    sticker_id=models.IntegerField(default=0)
     def __str__(self):
         return str(self.post)
 class Like(models.Model):
@@ -51,4 +54,13 @@ class Notification(models.Model):
     reference_id=models.IntegerField(null=True)
     def __str__(self):
         return self.touser.username
+class Sticker(models.Model):
+    sticker_img_url =models.URLField()
+    sticker_category =models.CharField(max_length=50,default='')
+    label=models.CharField(max_length=30,default='',unique=True)
+    
+
+    def __str__(self):
+        return str(self.id)
+
 

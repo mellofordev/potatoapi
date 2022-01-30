@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from .models import Post,Like,Comment,Notification
+from .models import Post,Like,Comment,Notification, Sticker
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from hashlib import blake2b
@@ -114,5 +114,23 @@ class NotificationSerializers(serializers.ModelSerializer):
         return obj.fromuser.username
     def get_touser(self,obj):
         return obj.touser.username
+class StickerSerializers(serializers.ModelSerializer):
+    class Meta:
+        model=Sticker
+        fields=['id','sticker_img_url','sticker_category','label']
 
+class CreateStickerSerializers(serializers.ModelSerializer):
+    class Meta:
+        model=Sticker
+        fields=['sticker_img_url','label','sticker_category']
 
+        def save(self):
+            
+            sticker=Sticker(
+
+                sticker_img_url=self.validated_data['sticker_img_url'],
+                label=self.validated_data['label'],
+                sticker_category=self.validated_data['sticker_category']
+            )
+
+            sticker.save()
