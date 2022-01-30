@@ -8,7 +8,28 @@ Being an open source social network we believe users have the full control over 
 - Mysql (database)
 - CORS Headers 
 - Python 3.7
+## Installing 
+```bash 
+$ git clone https://github.com/mellofordev/potatoapi.git
+```
+```bash 
+$ cd potatoapi
+ 
+```
+Create a virtual environment using the following command 
+```bash
+python -m venv <virtual environment name>
 
+```
+Activate virtual environment
+``` bash
+cd venv/Scripts
+$ activate.bat
+````
+Install the required packages by using the command (make sure you have pip intalled )
+```bash
+pip install -r requirements.txt
+```
 ## Features
 - Create and share memes using powerfull build-in meme generator
 - Custom sticker or template builder
