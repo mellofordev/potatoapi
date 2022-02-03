@@ -94,7 +94,7 @@ class CommentViewSerializers(serializers.ModelSerializer):
 
     class Meta:
         model=Comment
-        fields=['user','verified','profile_pic','comment']
+        fields=['user','verified','profile_pic','comment','sticker','sticker_id']
 
     def get_user(self,obj):
 

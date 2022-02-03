@@ -25,7 +25,7 @@ class Comment(models.Model):
     comment=models.CharField(max_length=100,default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sticker=models.BooleanField(default=False)
-    sticker_id=models.IntegerField(default=0)
+    sticker_id=models.IntegerField(default=0,null=True)
     def __str__(self):
         return str(self.post)
 class Like(models.Model):
