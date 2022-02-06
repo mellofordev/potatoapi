@@ -22,7 +22,7 @@ class Post(models.Model):
         return self.pk
 class Comment(models.Model):
     post = models.ForeignKey('social.Post', on_delete=models.CASCADE,related_name='comment')
-    comment=models.CharField(max_length=100,default='')
+    comment=models.CharField(max_length=100,default='',null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     sticker=models.BooleanField(default=False)
     sticker_id=models.IntegerField(default=0,null=True)

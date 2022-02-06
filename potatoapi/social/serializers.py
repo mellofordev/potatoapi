@@ -72,7 +72,7 @@ class PostSerializers(serializers.ModelSerializer):
 class CommentSerializers(serializers.ModelSerializer):
     class Meta:
         model=Comment
-        fields=['comment']
+        fields=['comment','sticker','sticker_id']
     def save(self):
         get_user=self.context.get('request').user
         get_post_short_link=self.context.get('slug')
@@ -80,7 +80,9 @@ class CommentSerializers(serializers.ModelSerializer):
         comment=Comment(
             post=get_post_id,
             comment=self.validated_data['comment'],
-            user=get_user
+            user=get_user,
+            sticker=self.validated_data['sticker'],
+            sticker_id=self.validated_data['sticker_id']
 
         )
 
@@ -91,10 +93,10 @@ class CommentViewSerializers(serializers.ModelSerializer):
     user=serializers.SerializerMethodField()
     verified=serializers.SerializerMethodField()
     profile_pic=serializers.SerializerMethodField()
-
+    sticker_img_url=serializers.SerializerMethodField()
     class Meta:
         model=Comment
-        fields=['user','verified','profile_pic','comment','sticker','sticker_id']
+        fields=['user','verified','profile_pic','comment','sticker','sticker_id','sticker_img_url']
 
     def get_user(self,obj):
 
@@ -103,6 +105,13 @@ class CommentViewSerializers(serializers.ModelSerializer):
         return obj.user.profile.verified
     def get_profile_pic(self,obj):
         return str(obj.user.profile.pic)
+    def get_sticker_img_url(self,obj):
+       
+        try:
+             get_sticker_obj =Sticker.objects.get(id=obj.sticker_id)
+        except ObjectDoesNotExist:
+            return "cannot read url"
+        return get_sticker_obj.sticker_img_url
 class NotificationSerializers(serializers.ModelSerializer):
     fromuser=serializers.SerializerMethodField()
     touser=serializers.SerializerMethodField()
