@@ -88,11 +88,23 @@ class UpdateProfileSerializers(serializers.ModelSerializer):
         model=Profile
         fields=('bio','name')
     def save(self):
+        
         user=self.instance
-        profile=Profile(
-            user=user,
-            bio=self.validated_data['bio'],
-            name=self.validated_data['name']
-        )
-        profile.save()
+        get_profile_data =Profile.objects.get(user=user)
+       
+        for i in self.validated_data:
+            if i=='bio':
+
+                get_profile_data.bio=self.validated_data[i]
+                get_profile_data.save()
+            elif i=='name':
+                get_profile_data.name=self.validated_data[i]
+                get_profile_data.save()
+            elif i=='pic':
+                get_profile_data.pic=self.validated_data[i]
+                get_profile_data.save()
+
+
+            
+        
 
