@@ -94,9 +94,11 @@ class CommentViewSerializers(serializers.ModelSerializer):
     verified=serializers.SerializerMethodField()
     profile_pic=serializers.SerializerMethodField()
     sticker_img_url=serializers.SerializerMethodField()
+    reference_post_id=serializers.SerializerMethodField()
+    
     class Meta:
         model=Comment
-        fields=['user','verified','profile_pic','comment','sticker','sticker_id','sticker_img_url']
+        fields=['user','verified','profile_pic','comment','sticker','sticker_id','sticker_img_url','reference_post_id']
 
     def get_user(self,obj):
 
@@ -112,6 +114,8 @@ class CommentViewSerializers(serializers.ModelSerializer):
         except ObjectDoesNotExist:
             return "cannot read url"
         return get_sticker_obj.sticker_img_url
+    def get_reference_post_id(self,obj):
+        return obj.post.post_short_link
 class NotificationSerializers(serializers.ModelSerializer):
     fromuser=serializers.SerializerMethodField()
     touser=serializers.SerializerMethodField()

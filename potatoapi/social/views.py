@@ -1,5 +1,4 @@
 from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import serializers
 from rest_framework.response import Response
 from .models import Follow, Post,Comment,Like,Notification, Sticker
 from rest_framework.decorators import api_view
@@ -312,4 +311,19 @@ def create_sticker_api(request):
         return Response({'sticker':'Sticker created successfully'})
     else:
         return Response({'error':'Something went wrong'})
-        
+@api_view(['GET'])
+def user_comment_list(request,slug):
+    authentication_classes =[TokenAuthentication]
+    if request.user.is_anonymous:
+        return Response({'error':'Token not provided'})
+
+    try:
+        get_user=User.objects.get(username=slug)
+        get_all_user_comment=Comment.objects.filter(user=get_user)
+        comment_bucket=[]
+        for i in get_all_user_comment:
+            serializer=CommentViewSerializers(i)
+            comment_bucket.append(serializer.data)
+        return Response({'comment':comment_bucket})
+    except ObjectDoesNotExist:
+        return Response({'sticker':'No comments'})

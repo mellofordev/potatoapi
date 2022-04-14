@@ -75,13 +75,14 @@ def user_profile(request): # edit profile api
     return Response({'profile':serializer.data,'login':response})
 
 
-@api_view(['PUT'])
-@login_required(login_url='/accounts/api/login/')
+@api_view(['POST'])
+#@login_required(login_url='/accounts/api/login/')
 def profile_update(request):
     authentication_classes=[TokenAuthentication]
     user=request.user
     #profile=Profile.objects.get(user=user)
-    
+    if user.is_anonymous:
+        return Response({'error':'Token not provided.'})
     serializer=UpdateProfileSerializers(user,data=request.data)
     print(serializer)
     response={}

@@ -58,8 +58,6 @@ class Sticker(models.Model):
     sticker_img_url =models.URLField()
     sticker_category =models.CharField(max_length=50,default='')
     label=models.CharField(max_length=30,default='',unique=True)
-    
-
     def __str__(self):
         return str(self.id)
 
