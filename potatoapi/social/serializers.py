@@ -98,7 +98,7 @@ class CommentViewSerializers(serializers.ModelSerializer):
     
     class Meta:
         model=Comment
-        fields=['user','verified','profile_pic','comment','sticker','sticker_id','sticker_img_url','reference_post_id']
+        fields=['id','user','verified','profile_pic','comment','sticker','sticker_id','sticker_img_url','reference_post_id']
 
     def get_user(self,obj):
 
@@ -147,3 +147,7 @@ class CreateStickerSerializers(serializers.ModelSerializer):
             )
 
             sticker.save()
+class UserLikeListSerializers(serializers.ModelSerializer):
+    class Meta:
+        model=Like
+        fields=['post_short_link','user']
